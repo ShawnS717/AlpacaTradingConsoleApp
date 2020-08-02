@@ -11,6 +11,8 @@ namespace AlpacaTradingApp
         public string Symbol;
         public float[] PriceHistory = new float[1440000];
         //4 hours worth of 1 update/sec ^^^
+        //currently set to update 1 history every half second
+        //to last 8 hours do 1 update every 2 seconds (watch 4 symbols at 1 check/half sec)
         private int indexer = 0;
 
         public float Average
@@ -29,8 +31,6 @@ namespace AlpacaTradingApp
                 } 
             } 
         }
-        //public float UpperAverage { get { return PriceHistory.Where(x => x >= Average).Average(); } }
-        //public float LowerAverage { get { return PriceHistory.Where(x => x != 0).Where(x => x <= Average).Average(); } }
 
         public SymbolHistory()
         {
@@ -38,6 +38,15 @@ namespace AlpacaTradingApp
             {
                 PriceHistory[i] = 0;
             }
+        }
+
+        public SymbolHistory(string symbol)
+        {
+            for (int i = 0; i < PriceHistory.Length; i++)
+            {
+                PriceHistory[i] = 0;
+            }
+            this.Symbol = symbol;
         }
 
         public SymbolHistory(IPosition position)

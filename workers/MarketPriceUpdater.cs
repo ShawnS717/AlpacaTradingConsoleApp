@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using System.Text;
 using AlpacaTradingApp.config;
 using System.Threading;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
+
+//this worker closes itself. no need to interupt it
 
 namespace AlpacaTradingApp.workers
 {
@@ -11,6 +15,8 @@ namespace AlpacaTradingApp.workers
     {
         private readonly AlpacaDataClient client;
         private readonly List<SymbolHistory> symbolHistories;
+        public DateTime StartTime;
+        public DateTime EndTime;
 
         public MarketPriceUpdater() { }
         public MarketPriceUpdater(AlpacaDataClient givenClient, List<SymbolHistory> givenSymbolHistories)
@@ -21,6 +27,7 @@ namespace AlpacaTradingApp.workers
 
         public void UpdatePrices()
         {
+            StartTime = DateTime.Now;
             while (true)
             {
                 if (Config.MarketAvaliability)
@@ -39,6 +46,7 @@ namespace AlpacaTradingApp.workers
                             }
                             if (item.UpdateCurrentPrice(newprice))
                                 Console.WriteLine("Price updated for: " + item.Symbol);
+                            //^^^if put into a winform app change the output location
 
                             Thread.Sleep(500);
                         }
@@ -50,8 +58,22 @@ namespace AlpacaTradingApp.workers
                 }
                 else
                 {
-                    //put after action report saving here
-                    
+                    EndTime = DateTime.Now;
+                    foreach(SymbolHistory history in symbolHistories)
+                    {
+                        string currentFileLocation = Path.Combine(Config.SaveFolder, history.Symbol, " ", DateTime.Today.ToShortDateString());
+                        File.AppendAllText(currentFileLocation,
+                            history.Symbol+"\n"+
+                            DateTime.Today.ToShortDateString()+"\n"+
+                            "Started: "+StartTime.ToShortTimeString()+"\n"+
+                            "Ended: "+EndTime.ToShortTimeString()+"\n\n"
+                            );
+                        foreach(float price in history.PriceHistory)
+                        {
+                            File.AppendAllText(currentFileLocation, price + "\n");
+                        }
+                    }
+
                     break;
                 }
             }

@@ -54,9 +54,8 @@ namespace AlpacaTradingApp
         /// </summary>
         /// <param name="symbol">Symbol to check if tradable</param>
         /// <returns>Boolean that says if it is tradable or not</returns>
-        public static async Task<bool> IsAssetTradable(string symbol)
+        public static async Task<bool> IsAssetTradable(AlpacaTradingClient client, string symbol)
         {
-            AlpacaTradingClient client = MakeTradingClient();
             try
             {
                 var asset = await client.GetAssetAsync(symbol.ToUpper());
@@ -106,9 +105,8 @@ namespace AlpacaTradingApp
         /// This method returns the symbols for each asset currently owned
         /// </summary>
         /// <returns>An array containing all the asset symbols</returns>
-        public static async Task<string[]> GetMyAssetSymbols()
+        public static async Task<string[]> GetMyAssetSymbols(AlpacaTradingClient client)
         {
-            AlpacaTradingClient client = MakeTradingClient();
             var assets = await client.ListPositionsAsync();
             string[] myAssets = new string[assets.Count];
             for(int i = 0; i < assets.Count; i++)
@@ -124,9 +122,8 @@ namespace AlpacaTradingApp
         /// <param name="symbol">the asset symbol</param>
         /// <param name="daysToCheck">days back check for change</param>
         /// <returns>The change in price for a set asset symbol over so many days</returns>
-        public static async Task<decimal> GetPriceChangePercentage(string symbol, int daysToCheck)
+        public static async Task<decimal> GetPriceChangePercentage(AlpacaDataClient client, string symbol, int daysToCheck)
         {
-            AlpacaDataClient client = MakeDataClient();
             var bars = await client.GetBarSetAsync(new BarSetRequest(symbol.ToUpper(), TimeFrame.Day) { Limit = daysToCheck });
             decimal startPrice = bars[symbol].First().Open;
             decimal endPrice = bars[symbol].Last().Close;
@@ -138,9 +135,8 @@ namespace AlpacaTradingApp
         /// <summary>
         /// Returns a bool telling you if the market is open or not
         /// </summary>
-        public static async Task<bool> IsMarketOpen()
+        public static async Task<bool> IsMarketOpen(AlpacaTradingClient client)
         {
-            AlpacaTradingClient client = MakeTradingClient();
             var clock = await client.GetClockAsync();
             if (clock.IsOpen)
             {
@@ -157,9 +153,8 @@ namespace AlpacaTradingApp
         /// </summary>
         /// <param name="symbol">the symbol for the asset you wish to get</param>
         /// <param name="qty">the quantity you wish to get</param>
-        public static async void PlaceBuyOrder(string symbol, int qty)
+        public static async void PlaceBuyOrder(AlpacaTradingClient client, string symbol, int qty)
         {
-            AlpacaTradingClient client = MakeTradingClient();
             var order = await client.PostOrderAsync(new NewOrderRequest(symbol.ToUpper(), qty, OrderSide.Buy, OrderType.Market, TimeInForce.Day));
             Console.WriteLine($"Buy order made for: {symbol.ToUpper()}, Qty: {qty}");
         }
@@ -169,9 +164,8 @@ namespace AlpacaTradingApp
         /// </summary>
         /// <param name="symbol">the symbol for the assset to sell</param>
         /// <param name="qty">the quantity to sell</param>
-        public static async void PlaceSellOrder(string symbol, int qty)
+        public static async void PlaceSellOrder(AlpacaTradingClient client, string symbol, int qty)
         {
-            AlpacaTradingClient client = MakeTradingClient();
             var order = await client.PostOrderAsync(new NewOrderRequest(symbol.ToUpper(), qty, OrderSide.Sell, OrderType.Market, TimeInForce.Day));
             Console.WriteLine($"Sell order made for: {symbol.ToUpper()}, Qty: {qty}");
         }
