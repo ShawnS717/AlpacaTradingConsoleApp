@@ -19,16 +19,7 @@ namespace AlpacaTradingApp
         {
             get
             {
-                try
-                {
-                    return PriceHistory.Where(x => x != 0).Average();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                    Environment.Exit(1);
-                    return 0;
-                } 
+                return (PriceHistory[0]==0)?0:PriceHistory.Where(x => x != 0).Average();
             } 
         }
 

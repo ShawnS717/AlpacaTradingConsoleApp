@@ -13,7 +13,7 @@ namespace AlpacaTradingApp
     class Master
     {
         static void Main(string[] args)
-        {    
+        {
             //make the needed shared variables
             AlpacaTradingClient tradeClient = APIPortal.MakeTradingClient();
             AlpacaDataClient dataClient = APIPortal.MakeDataClient();
@@ -30,6 +30,7 @@ namespace AlpacaTradingApp
                     Config.LastMarketAvaliability = Config.MarketAvaliability;
                     Config.MarketAvaliability = APIPortal.IsMarketOpen(tradeClient).Result;
                 }
+
                 //if the market has opened then start the workers
                 if (Config.MarketAvaliability && !Config.LastMarketAvaliability)
                 {
@@ -41,9 +42,11 @@ namespace AlpacaTradingApp
 
                     //make the workers
                     Thread priceUpdater = new Thread(new MarketPriceUpdater(dataClient, histories).UpdatePrices);
+                    Thread shortTermBroker = new Thread(new ShortTermBroker(tradeClient, histories).EventLoop);
 
                     //start the workers
                     priceUpdater.Start();
+                    shortTermBroker.Start();
 
                     //(added for testing purposes)
                     Console.WriteLine("press enter to stop the program");
@@ -58,14 +61,14 @@ namespace AlpacaTradingApp
                 }
                 //wait 10min and see if it's still open
                 //temp:moved to 1min for testing purposes
-                Thread.Sleep(60000);
+                Thread.Sleep(60000);//0
             }
         }
 
         public static List<SymbolHistory> CreateHistories()
         {
             List<SymbolHistory> symbolHistories = new List<SymbolHistory>();
-            foreach(string symbol in Config.WatchedSymbols)
+            foreach (string symbol in Config.WatchedSymbols)
             {
                 symbolHistories.Add(new SymbolHistory(symbol));
             }
