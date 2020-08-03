@@ -24,7 +24,9 @@ namespace AlpacaTradingApp.workers
         {
             while (Config.MarketAvaliability)
             {
-                
+                //keep in mind that you want to settle old buisness before starting new buisness
+                //in other words sell before you buy
+
             }
         }
     }

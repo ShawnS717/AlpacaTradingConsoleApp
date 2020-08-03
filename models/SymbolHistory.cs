@@ -7,20 +7,38 @@ using System.Text;
 namespace AlpacaTradingApp
 {
     public class SymbolHistory
-    {
+    {      
+        private int indexer = 0;
+
         public string Symbol;
         public float[] PriceHistory = new float[1440000];
         //4 hours worth of 1 update/sec ^^^
         //currently set to update 1 history every half second
         //to last 8 hours do 1 update every 2 seconds (watch 4 symbols at 1 check/half sec)
-        private int indexer = 0;
-
         public float Average
         {
             get
             {
                 return (PriceHistory[0]==0)?0:PriceHistory.Where(x => x != 0).Average();
+            }
+        }
+        public float UpperAverage
+        {
+            get
+            {
+                float average = Average;
+                float upperAverage = PriceHistory.Where(x => x >= average).Average();
+                return upperAverage;
             } 
+        }
+        public float LowerAverage
+        {
+            get
+            {
+                float average = Average;
+                float lowerAverage = PriceHistory.Where(x => x != 0).Where(x => x <= average).Average();
+                return lowerAverage;
+            }
         }
 
         public SymbolHistory()
@@ -70,15 +88,12 @@ namespace AlpacaTradingApp
 
         public override string ToString()
         {
-            float average = Average;
-            float upperAverage = PriceHistory.Where(x => x >= average).Average();
-            float lowerAverage = PriceHistory.Where(x => x != 0).Where(x => x <= average).Average();
             return
                 $"Symbol: {Symbol}\n" +
                 $"Current Price: {PriceHistory[indexer-1]}\n" +
-                $"Average: {average}\n" +
-                $"Upper bound average: {upperAverage}\n" +
-                $"Lower bound average: {lowerAverage}\n";
+                $"Average: {Average}\n" +
+                $"Upper bound average: {UpperAverage}\n" +
+                $"Lower bound average: {LowerAverage}\n";
         }
     }
 }
