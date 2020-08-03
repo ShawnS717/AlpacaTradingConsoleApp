@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace AlpacaTradingApp
 {
@@ -16,6 +17,10 @@ namespace AlpacaTradingApp
             //make the needed shared variables
             AlpacaTradingClient tradeClient = APIPortal.MakeTradingClient();
             AlpacaDataClient dataClient = APIPortal.MakeDataClient();
+            if (!Directory.Exists(Config.SaveFolder))
+            {
+                Directory.CreateDirectory(Config.SaveFolder);
+            }
 
             //check if the market is open
             while (true)
@@ -39,6 +44,13 @@ namespace AlpacaTradingApp
 
                     //start the workers
                     priceUpdater.Start();
+
+                    //(added for testing purposes)
+                    Console.WriteLine("press enter to stop the program");
+                    Console.ReadLine();
+                    Config.MarketAvaliability = false;
+                    break;
+                    //(added for testing purposes)
                 }
                 else
                 {

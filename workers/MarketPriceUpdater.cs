@@ -6,6 +6,7 @@ using AlpacaTradingApp.config;
 using System.Threading;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using System.Linq;
 
 //this worker closes itself. no need to interupt it
 
@@ -59,21 +60,22 @@ namespace AlpacaTradingApp.workers
                 else
                 {
                     EndTime = DateTime.Now;
-                    foreach(SymbolHistory history in symbolHistories)
+                    foreach (SymbolHistory history in symbolHistories)
                     {
-                        string currentFileLocation = Path.Combine(Config.SaveFolder, history.Symbol, " ", DateTime.Today.ToShortDateString());
+                        string currentFileLocation = Path.Combine(Config.SaveFolder, history.Symbol + " " + DateTime.Today.Day + "-" + DateTime.Today.Month + "-" + DateTime.Today.Year + ".txt");
                         File.AppendAllText(currentFileLocation,
-                            history.Symbol+"\n"+
-                            DateTime.Today.ToShortDateString()+"\n"+
-                            "Started: "+StartTime.ToShortTimeString()+"\n"+
-                            "Ended: "+EndTime.ToShortTimeString()+"\n\n"
+                            history.Symbol + "\n" +
+                            DateTime.Today.ToShortDateString() + "\n" +
+                            "Started: " + StartTime.ToShortTimeString() + "\n" +
+                            "Ended: " + EndTime.ToShortTimeString() + "\n\n"
                             );
-                        foreach(float price in history.PriceHistory)
+                        StringBuilder builder = new StringBuilder();
+                        foreach (float price in history.PriceHistory.Where(x => x != 0))
                         {
-                            File.AppendAllText(currentFileLocation, price + "\n");
+                            builder.Append(price.ToString()).AppendLine();
                         }
+                        File.AppendAllText(currentFileLocation, builder.ToString());
                     }
-
                     break;
                 }
             }
