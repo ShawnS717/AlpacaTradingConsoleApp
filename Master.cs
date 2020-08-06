@@ -17,41 +17,52 @@ namespace AlpacaTradingApp
             //make the needed shared variables
             AlpacaTradingClient tradeClient = APIPortal.MakeTradingClient();
             AlpacaDataClient dataClient = APIPortal.MakeDataClient();
-            if (!Directory.Exists(Config.SaveFolder))
+            if (!Directory.Exists(Globals.SaveFolder))
             {
-                Directory.CreateDirectory(Config.SaveFolder);
+                Directory.CreateDirectory(Globals.SaveFolder);
             }
+            Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
 
             //check if the market is open
             while (true)
             {
                 lock (tradeClient)
                 {
-                    Config.LastMarketAvaliability = Config.MarketAvaliability;
-                    Config.MarketAvaliability = APIPortal.IsMarketOpen(tradeClient).Result;
+                    Globals.LastMarketAvaliability = Globals.MarketAvaliability;
+                    Globals.MarketAvaliability = APIPortal.IsMarketOpen(tradeClient).Result;
                 }
 
                 //if the market has opened then start the workers
-                if (Config.MarketAvaliability && !Config.LastMarketAvaliability)
+                if (Globals.MarketAvaliability && !Globals.LastMarketAvaliability)
                 {
-                    Console.WriteLine("Market is open");
+                    Console.WriteLine("Market has opened");
+                    //TODO:
                     //load the previous days data here
 
                     //make a new list of histories for todays workers
                     List<SymbolHistory> histories = CreateHistories();
 
-                    //make the workers
-                    Thread priceUpdater = new Thread(new MarketPriceUpdater(dataClient, histories).UpdatePrices);
-                    Thread shortTermBroker = new Thread(new ShortTermBroker(tradeClient, histories).EventLoop);
+                    //make and link the workers
+                    MarketPriceUpdater priceUpdateWorker = new MarketPriceUpdater(dataClient, histories);
+                    Auditor auditor = new Auditor(tradeClient);
+                    ShortTermBroker dayTrader = new ShortTermBroker(tradeClient, histories, auditor);
+
+
+                    Thread callTimer = new Thread(new ApiCallTimer().StartEventLoop);
+                    Thread priceUpdater = new Thread(priceUpdateWorker.UpdatePrices);
+                    Thread runAuditor = new Thread(auditor.StartEventLoop);
+                    Thread shortTermBroker = new Thread(dayTrader.StartEventLoop);
 
                     //start the workers
+                    callTimer.Start();
                     priceUpdater.Start();
+                    runAuditor.Start();
                     shortTermBroker.Start();
 
                     //(added for testing purposes)
                     Console.WriteLine("press enter to stop the program");
                     Console.ReadLine();
-                    Config.MarketAvaliability = false;
+                    Globals.MarketAvaliability = false;
                     break;
                     //(added for testing purposes)
                 }
@@ -68,7 +79,7 @@ namespace AlpacaTradingApp
         public static List<SymbolHistory> CreateHistories()
         {
             List<SymbolHistory> symbolHistories = new List<SymbolHistory>();
-            foreach (string symbol in Config.WatchedSymbols)
+            foreach (string symbol in Globals.WatchedSymbols)
             {
                 symbolHistories.Add(new SymbolHistory(symbol));
             }

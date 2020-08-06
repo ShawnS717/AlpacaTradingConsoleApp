@@ -31,11 +31,11 @@ namespace AlpacaTradingApp.workers
             StartTime = DateTime.Now;
             while (true)
             {
-                if (Config.MarketAvaliability)
+                if (Globals.MarketAvaliability)
                 {
                     foreach (SymbolHistory item in symbolHistories)
                     {
-                        if (Config.MarketAvaliability)
+                        if (Globals.MarketAvaliability)
                         {
                             decimal newprice;
                             lock (client)
@@ -43,6 +43,7 @@ namespace AlpacaTradingApp.workers
                                 lock (symbolHistories)
                                 {
                                     newprice = APIPortal.PriceCheck(client, item.Symbol).Result;
+                                    Globals.ApiCalls--;
                                 }
                             }
                             if (item.UpdateCurrentPrice(newprice))
