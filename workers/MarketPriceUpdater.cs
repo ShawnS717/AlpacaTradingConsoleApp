@@ -60,6 +60,7 @@ namespace AlpacaTradingApp.workers
                 }
                 else
                 {
+                    //TODO:
                     /////////////////////////////////////////////////
                     //Saving temporaraly commented out until a long term broker is created
                     //unneeded until that day

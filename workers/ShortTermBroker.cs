@@ -39,22 +39,20 @@ namespace AlpacaTradingApp.workers
                 //in other words sell before you buy
 
                 //if there is stuff to sell then do it first
-                if (linkedAuditor.assets != null && linkedAuditor.assets.Count>0)
+                if (linkedAuditor.assets != null && linkedAuditor.assets.Count > 0)
                 {
-                    foreach(Asset asset in linkedAuditor.assets)
+                    foreach (Asset asset in linkedAuditor.assets)
                     {
-                        //if an asset is good to sell or is past a loss threshold, sell it
-                        if (asset.CurrentPrice > asset.PurchasedAt ||asset.CurrentPrice<= asset.PurchasedAt-1)
+                        //if an asset is good to sell or is past a loss threshold,    ==>                                                   and doesn't have an active sell order, sell it
+                        if (asset.CurrentPrice >= asset.PurchasedAt+(decimal).02 || asset.CurrentPrice <= asset.PurchasedAt - 1 || linkedAuditor.orders.Where(x => x.Symbol == asset.Symbol).Count() > 0)
                         {
+                            APIPortal.PlaceSellOrder(client, asset.Symbol, asset.Quantity);
+                            //wait a second to sell
+                            Thread.Sleep(2000);
 
                         }
                     }
                 }
-                //find out what assets are being sold
-
-
-                //remember to wait a bit so you don't go over the api call limit
-                //1.5 seconds per api call (anything using the api portal class)
                 Thread.Sleep(60000);
             }
         }

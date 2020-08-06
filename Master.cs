@@ -21,6 +21,8 @@ namespace AlpacaTradingApp
             {
                 Directory.CreateDirectory(Globals.SaveFolder);
             }
+
+            //due to the importance of this thread, make sure it gets priority
             Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
 
             //check if the market is open

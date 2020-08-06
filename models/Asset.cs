@@ -22,6 +22,7 @@ namespace AlpacaTradingApp
             Quantity = position.Quantity;
             ChangePercentage = position.AssetChangePercent;
             CurrentPrice = position.AssetCurrentPrice;
+            PurchasedAt = 0;
         }
 
         public override string ToString()

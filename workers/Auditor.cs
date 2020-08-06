@@ -38,6 +38,8 @@ namespace AlpacaTradingApp.workers
                     Console.WriteLine("Auditer updated orders list");
                 }
 
+                Globals.CurrentlyInvested = assets.Select(x => x.PurchasedAt).Sum();
+
                 Console.WriteLine("Assets owned:");
                 foreach (Asset item in assets)
                 {

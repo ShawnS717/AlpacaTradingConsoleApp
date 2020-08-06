@@ -28,6 +28,7 @@ namespace AlpacaTradingApp.config
             "EEA"
         };
         public static decimal InvestingMaxAmount = 10;
+        public static decimal CurrentlyInvested = 0;
         public static decimal IndividualInvestMaxAmount = 1;
     }
 }
