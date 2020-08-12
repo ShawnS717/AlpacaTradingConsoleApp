@@ -38,8 +38,6 @@ namespace AlpacaTradingApp
                 if (Globals.MarketAvaliability && !Globals.LastMarketAvaliability)
                 {
                     Console.WriteLine("Market has opened");
-                    //TODO:
-                    //load the previous days data here
 
                     //make a new list of histories for todays workers
                     List<SymbolHistory> histories = CreateHistories();
@@ -49,6 +47,7 @@ namespace AlpacaTradingApp
                     Auditor auditor = new Auditor(tradeClient);
                     ShortTermBroker dayTrader = new ShortTermBroker(tradeClient, histories, auditor);
 
+                    //put pointers to any events here:
 
                     Thread callTimer = new Thread(new ApiCallTimer().StartEventLoop);
                     Thread priceUpdater = new Thread(priceUpdateWorker.UpdatePrices);

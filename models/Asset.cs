@@ -7,12 +7,13 @@ namespace AlpacaTradingApp
 {
     public class Asset
     {
+        //TODO maby:
+        //develop a long term storage solution to keeping track of what assets you have purchased
         public Guid AssetID { get; set; }
         public string Symbol { get; set; }
         public int Quantity { get; set; }
         public decimal ChangePercentage { get; set; }
         public decimal CurrentPrice { get; set; }
-        public decimal PurchasedAt { get; set; }
 
         public Asset() { }
         public Asset(IPosition position)
@@ -22,18 +23,16 @@ namespace AlpacaTradingApp
             Quantity = position.Quantity;
             ChangePercentage = position.AssetChangePercent;
             CurrentPrice = position.AssetCurrentPrice;
-            PurchasedAt = 0;
         }
 
         public override string ToString()
         {
-            return 
+            return
                 $"AssetID: {AssetID}\n" +
                 $"Symbol: {Symbol}\n" +
                 $"Quantity: {Quantity}\n" +
                 $"Change Percentage: {ChangePercentage}\n" +
-                $"Current Price: {CurrentPrice}\n" +
-                $"Purchased Price: {PurchasedAt}\n";
+                $"Current Price: {CurrentPrice}\n";
         }
     }
 }

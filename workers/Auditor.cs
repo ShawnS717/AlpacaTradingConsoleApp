@@ -38,7 +38,7 @@ namespace AlpacaTradingApp.workers
                     Console.WriteLine("Auditer updated orders list");
                 }
 
-                Globals.CurrentlyInvested = assets.Select(x => x.PurchasedAt).Sum();
+                Globals.CurrentlyInvested = assets.Select(x => x.ChangePercentage*x.CurrentPrice).Sum();
 
                 Console.WriteLine("Assets owned:");
                 foreach (Asset item in assets)

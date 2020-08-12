@@ -22,6 +22,8 @@ namespace AlpacaTradingApp
             Globals.ApiCalls++;
         }
 
+        //to switch to live trading you need to get a live trading account and update the keys
+        //and then change the clients enviroments from paper to live
         public static AlpacaTradingClient MakeTradingClient()
         {
             return Alpaca.Markets.Environments.Paper.GetAlpacaTradingClient(new SecretKey(config.Globals.APIKey, config.Globals.APISecretKey));

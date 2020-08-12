@@ -43,14 +43,26 @@ namespace AlpacaTradingApp.workers
                 {
                     foreach (Asset asset in linkedAuditor.assets)
                     {
-                        //if an asset is good to sell or is past a loss threshold,    ==>                                                   and doesn't have an active sell order, sell it
-                        if (asset.CurrentPrice >= asset.PurchasedAt+(decimal).02 || asset.CurrentPrice <= asset.PurchasedAt - 1 || linkedAuditor.orders.Where(x => x.Symbol == asset.Symbol).Count() > 0)
+                        //if an asset is good to sell                       or is past a loss threshold,             and doesn't have an active sell order, sell it
+                        if (asset.ChangePercentage >= (decimal)1.1 || asset.ChangePercentage < (decimal).7 || linkedAuditor.orders.Where(x => x.Symbol == asset.Symbol).Count() > 0)
                         {
+                            Console.WriteLine($"Placing sell order for {asset.Symbol}");
                             APIPortal.PlaceSellOrder(client, asset.Symbol, asset.Quantity);
-                            //wait a second to sell
-                            Thread.Sleep(2000);
-
+                            //wait a second (just in case)
+                            Thread.Sleep(1000);
                         }
+                    }
+                }
+                //now that everything that needs selling is put up see if anything is worth buying
+                //go through each watched history and if there are no active orders for it (buy or sell)
+                foreach (SymbolHistory history in symbolHistories.Where(histories=> !linkedAuditor.orders.Any(x => x.Symbol == histories.Symbol)))
+                {
+                    //then see if it's worth buying and do so
+
+                    //let's start with only todays data and make decisions from that
+                    if (history.PriceHistory.Where(x => x != 0).Count() > 100)
+                    {
+
                     }
                 }
                 Thread.Sleep(60000);
