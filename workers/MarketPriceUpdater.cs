@@ -29,37 +29,35 @@ namespace AlpacaTradingApp.workers
         public void UpdatePrices()
         {
             StartTime = DateTime.Now;
-            while (true)
+            while (Globals.MarketAvaliability)
             {
-                if (Globals.MarketAvaliability)
+                foreach (SymbolHistory item in symbolHistories)
                 {
-                    foreach (SymbolHistory item in symbolHistories)
+                    if (Globals.MarketAvaliability)
                     {
-                        if (Globals.MarketAvaliability)
+                        decimal newprice;
+                        lock (client)
                         {
-                            decimal newprice;
-                            lock (client)
+                            lock (symbolHistories)
                             {
-                                lock (symbolHistories)
-                                {
-                                    newprice = APIPortal.PriceCheck(client, item.Symbol).Result;
-                                    Globals.ApiCalls--;
-                                }
+                                newprice = APIPortal.PriceCheck(client, item.Symbol).Result;
+                                Globals.ApiCalls--;
                             }
-                            if (item.UpdateCurrentPrice(newprice))
-                                Console.WriteLine("Price updated for: " + item.Symbol);
-                            //^^^if put into a winform app change the output location
+                        }
+                        if (item.UpdateCurrentPrice(newprice))
+                            Console.WriteLine("Price updated for: " + item.Symbol);
+                        //^^^if put into a winform app change the output location
 
-                            Thread.Sleep(500);
-                        }
-                        else
-                        {
-                            continue;
-                        }
+                        Thread.Sleep(500);
+                    }
+                    else
+                    {
+                        continue;
                     }
                 }
-                else
-                {
+            }
+            //after the market closes do the saving
+
                     //TODO:
                     /////////////////////////////////////////////////
                     //Saving temporaraly commented out until a long term broker is created
@@ -82,9 +80,7 @@ namespace AlpacaTradingApp.workers
                     //    }
                     //    File.AppendAllText(currentFileLocation, builder.ToString());
                     //}
-                    break;
-                }
-            }
+
         }
     }
 }

@@ -3,9 +3,7 @@ using AlpacaTradingApp.workers;
 using AlpacaTradingApp.config;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using System.IO;
 
 namespace AlpacaTradingApp
@@ -59,21 +57,12 @@ namespace AlpacaTradingApp
                     priceUpdater.Start();
                     runAuditor.Start();
                     shortTermBroker.Start();
-
-                    //(added for testing purposes)
-                    Console.WriteLine("press enter to stop the program");
-                    Console.ReadLine();
-                    Globals.MarketAvaliability = false;
-                    break;
-                    //(added for testing purposes)
                 }
                 else
                 {
                     Console.WriteLine("Market is closed");
                 }
-                //wait 10min and see if it's still open
-                //temp:moved to 1min for testing purposes
-                Thread.Sleep(60000);//0
+                Thread.Sleep(600000);//0
             }
         }
 

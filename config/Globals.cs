@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace AlpacaTradingApp.config
 {
@@ -11,6 +10,10 @@ namespace AlpacaTradingApp.config
         //120 per minute for updating prices (0.5 sec)
         //80 calls remaining
         //rest of the calls are to be handled by thread priority
+
+        //things to consider:
+        //consider making some events upon making some buy/sell orders
+        //consider seeing when a buy/sell order gets filled
         public static readonly string APIKey = "PKL8Q4FIICRVFDTV6LGB";
         public static readonly string APISecretKey = "GIGnlGQIx8eRfV2zkC5TKj69wZe6M/ybWGXv4el0";
         public static byte ApiCalls = 0;
