@@ -14,6 +14,13 @@ namespace AlpacaTradingApp
         public int Quantity { get; set; }
         public decimal ChangePercentage { get; set; }
         public decimal CurrentPrice { get; set; }
+        public decimal PurchasedAt
+        {
+            get
+            {
+                return CurrentPrice * ChangePercentage;
+            }
+        }
 
         public Asset() { }
         public Asset(IPosition position)
@@ -32,7 +39,8 @@ namespace AlpacaTradingApp
                 $"Symbol: {Symbol}\n" +
                 $"Quantity: {Quantity}\n" +
                 $"Change Percentage: {ChangePercentage}\n" +
-                $"Current Price: {CurrentPrice}\n";
+                $"Current Price: {CurrentPrice}\n" +
+                $"Purchased at: {PurchasedAt}\n";
         }
     }
 }

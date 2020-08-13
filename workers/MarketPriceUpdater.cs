@@ -15,7 +15,7 @@ namespace AlpacaTradingApp.workers
     public class MarketPriceUpdater
     {
         private readonly AlpacaDataClient client;
-        private readonly List<SymbolHistory> symbolHistories;
+        private List<SymbolHistory> symbolHistories;
         public DateTime StartTime;
         public DateTime EndTime;
 

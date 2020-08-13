@@ -10,7 +10,7 @@ namespace AlpacaTradingApp.workers
 {
     class ShortTermBroker
     {
-        private AlpacaTradingClient client;
+        private readonly AlpacaTradingClient client;
         private List<SymbolHistory> symbolHistories;
         private Auditor linkedAuditor;
 
@@ -41,6 +41,7 @@ namespace AlpacaTradingApp.workers
                 //if there is stuff to sell then do it first
                 if (linkedAuditor.assets != null && linkedAuditor.assets.Count > 0)
                 {
+                    Console.WriteLine("Found assets to sell");
                     foreach (Asset asset in linkedAuditor.assets)
                     {
                         //if an asset is good to sell                       or is past a loss threshold,             and doesn't have an active sell order, sell it
@@ -55,14 +56,18 @@ namespace AlpacaTradingApp.workers
                 }
                 //now that everything that needs selling is put up see if anything is worth buying
                 //go through each watched history and if there are no active orders for it (buy or sell)
-                foreach (SymbolHistory history in symbolHistories.Where(histories=> !linkedAuditor.orders.Any(x => x.Symbol == histories.Symbol)))
+                foreach (SymbolHistory history in symbolHistories.Where(histories => !linkedAuditor.orders.Any(x => x.Symbol == histories.Symbol)))
                 {
                     //then see if it's worth buying and do so
 
                     //let's start with only todays data and make decisions from that
                     if (history.PriceHistory.Where(x => x != 0).Count() > 100)
                     {
-
+                        //if the price is below the lower average           ==>                                 and you can buy it then do so
+                        if (history.PriceHistory.Where(x => x != 0).Last() <= history.LowerAverage && history.PriceHistory.Where(x => x != 0).Last() + (float)Globals.CurrentlyInvested <= (float)Globals.InvestingMaxAmount)
+                        {
+                            APIPortal.PlaceBuyOrder(client, history.Symbol, 1);
+                        }
                     }
                 }
                 Thread.Sleep(60000);

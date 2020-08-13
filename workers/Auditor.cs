@@ -12,7 +12,7 @@ namespace AlpacaTradingApp.workers
     //brokers to make decisions
     class Auditor
     {
-        private AlpacaTradingClient client;
+        private readonly AlpacaTradingClient client;
         public List<Asset> assets;
         public IReadOnlyList<IOrder> orders;
 
@@ -38,7 +38,7 @@ namespace AlpacaTradingApp.workers
                     Console.WriteLine("Auditer updated orders list");
                 }
 
-                Globals.CurrentlyInvested = assets.Select(x => x.ChangePercentage*x.CurrentPrice).Sum();
+                Globals.CurrentlyInvested = assets.Select(x => x.PurchasedAt).Sum();
 
                 Console.WriteLine("Assets owned:");
                 foreach (Asset item in assets)
