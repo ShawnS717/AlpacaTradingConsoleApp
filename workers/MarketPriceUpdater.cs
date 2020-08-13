@@ -7,6 +7,7 @@ using System.Threading;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Linq;
+using System.Threading.Tasks;
 
 //this worker closes itself. no need to interupt it
 
@@ -26,11 +27,12 @@ namespace AlpacaTradingApp.workers
             symbolHistories = givenSymbolHistories;
         }
 
-        public void UpdatePrices()
+        public async void UpdatePrices()
         {
             StartTime = DateTime.Now;
             while (Globals.MarketAvaliability)
             {
+                var minuteTimer = Task.Run(() => Thread.Sleep(60000));
                 foreach (SymbolHistory item in symbolHistories)
                 {
                     if (Globals.MarketAvaliability)
@@ -55,6 +57,7 @@ namespace AlpacaTradingApp.workers
                         continue;
                     }
                 }
+                await minuteTimer;
             }
             //after the market closes do the saving
 

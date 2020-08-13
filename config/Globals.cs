@@ -24,13 +24,18 @@ namespace AlpacaTradingApp.config
 
         public static List<string> WatchedSymbols = new List<string>()
         {
-            "M",
             "CIF",
             "AACG",
             "AAME",
-            "EEA"
+            "AIQ",
+            "CUBA",
+            "BDCY",
+            "AGS",
+            "GROW",
+            "EOD",
         };
-        public static decimal InvestingMaxAmount = 10;
+        //for the sake of testing the max has been upped from 10
+        public static decimal InvestingMaxAmount = 100;
         public static decimal CurrentlyInvested = 0;
         public static decimal IndividualInvestMaxAmount = 1;
     }
