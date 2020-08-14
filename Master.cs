@@ -62,7 +62,7 @@ namespace AlpacaTradingApp
                 {
                     Console.WriteLine("Market is closed");
                 }
-                Thread.Sleep(600000);//0
+                Thread.Sleep(60000);
             }
         }
 

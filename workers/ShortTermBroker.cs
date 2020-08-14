@@ -61,10 +61,11 @@ namespace AlpacaTradingApp.workers
                     //then see if it's worth buying and do so
 
                     //let's start with only todays data and make decisions from that
+                    //see if there is sufficent data to work with
                     if (history.PriceHistory.Where(x => x != 0).Count() > 100)
                     {
-                        //if the price is below the lower average           ==>                                 and you can buy it then do so
-                        if (history.PriceHistory.Where(x => x != 0).Last() <= history.LowerAverage && history.PriceHistory.Where(x => x != 0).Last() + (float)Globals.CurrentlyInvested <= (float)Globals.InvestingMaxAmount)
+                        //if the price is below the lower average           ==>                                 and you can buy it then do so                                                                                     and you don't own any of this symbol
+                        if (history.PriceHistory.Where(x => x != 0).Last() <= history.LowerAverage && history.PriceHistory.Where(x => x != 0).Last() + (float)Globals.CurrentlyInvested <= (float)Globals.InvestingMaxAmount && !linkedAuditor.assets.Any(x=>x.Symbol == history.Symbol))
                         {
                             APIPortal.PlaceBuyOrder(client, history.Symbol, 1);
                         }
