@@ -56,7 +56,7 @@ namespace AlpacaTradingApp.workers
                 }
                 //now that everything that needs selling is put up see if anything is worth buying
                 //go through each watched history and if there are no active orders for it (buy or sell)
-                foreach (SymbolHistory history in symbolHistories.Where(histories => !linkedAuditor.orders.Any(x => x.Symbol == histories.Symbol)))
+                foreach (SymbolHistory history in (linkedAuditor.orders!=null)?symbolHistories.Where(histories => !linkedAuditor.orders.Any(x => x.Symbol == histories.Symbol)):symbolHistories)
                 {
                     //then see if it's worth buying and do so
 
