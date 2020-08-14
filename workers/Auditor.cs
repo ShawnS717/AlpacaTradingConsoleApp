@@ -43,7 +43,7 @@ namespace AlpacaTradingApp.workers
                 Console.WriteLine("Assets owned:");
                 foreach (Asset item in assets)
                 {
-                    Console.WriteLine("\t" + item.Symbol + " Qty: " + item.Quantity);
+                    Console.WriteLine("\t" + item.Symbol + " Qty: " + item.Quantity + " Change perentage: " + item.ChangePercentage);
                 }
                 Console.WriteLine("Active orders:");
                 foreach (IOrder item in orders)
