@@ -58,7 +58,7 @@ namespace AlpacaTradingApp
                     runAuditor.Start();
                     shortTermBroker.Start();
                 }
-                else
+                else if(!Globals.MarketAvaliability)
                 {
                     Console.WriteLine("Market is closed");
                 }
