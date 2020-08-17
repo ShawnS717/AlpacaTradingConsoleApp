@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.IO;
+using System.Net.Http.Headers;
 
 namespace AlpacaTradingApp
 {
@@ -57,6 +58,18 @@ namespace AlpacaTradingApp
                     priceUpdater.Start();
                     runAuditor.Start();
                     shortTermBroker.Start();
+
+                    //while the market is open, check on the threads
+                    while (Globals.MarketAvaliability)
+                    {
+                        //every 30 seconds check the threads
+                        Thread.Sleep(30000);
+
+                        Console.WriteLine(callTimer.ThreadState);
+                        Console.WriteLine(priceUpdater.ThreadState);
+                        Console.WriteLine(runAuditor.ThreadState);
+                        Console.WriteLine(shortTermBroker.ThreadState);
+                    }
                 }
                 else if(!Globals.MarketAvaliability)
                 {
