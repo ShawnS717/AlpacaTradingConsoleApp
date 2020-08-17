@@ -18,7 +18,7 @@ namespace AlpacaTradingApp
         {
             get
             {
-                return CurrentPrice * ChangePercentage;
+                return CurrentPrice + (CurrentPrice * ChangePercentage);
             }
         }
 

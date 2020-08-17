@@ -37,8 +37,16 @@ namespace AlpacaTradingApp
         {
             WaitUntilAvaliable();
             AlpacaTradingClient client = MakeTradingClient();
-            var account = await client.GetAccountAsync();
-
+            IAccount account = null;
+            try
+            {
+                account = await client.GetAccountAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
+            }
             if (account.IsTradingBlocked)
             {
                 Console.WriteLine("Account is currently restricted from trading.");
@@ -56,10 +64,18 @@ namespace AlpacaTradingApp
         {
             WaitUntilAvaliable();
             AlpacaTradingClient client = MakeTradingClient();
-            var account = await client.GetAccountAsync();
-            decimal ballanceChange = account.Equity - account.LastEquity;
+            try
+            {
+                var account = await client.GetAccountAsync();
+                decimal ballanceChange = account.Equity - account.LastEquity;
 
-            Console.WriteLine("Profit made: " + ballanceChange);
+                Console.WriteLine("Profit made: " + ballanceChange);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
+            }
         }
 
         /// <summary>
@@ -96,8 +112,17 @@ namespace AlpacaTradingApp
         public static async Task<decimal> PriceCheck(AlpacaDataClient client, string symbol)
         {
             WaitUntilAvaliable();
-            var result = await client.GetBarSetAsync(new BarSetRequest(symbol.ToUpper(), TimeFrame.Minute));
-            return result[symbol].Last().Low;
+            try
+            {
+                var result = await client.GetBarSetAsync(new BarSetRequest(symbol.ToUpper(), TimeFrame.Minute));
+                return result[symbol].Last().Low;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
+                return 0;
+            }
         }
 
         /// <summary>
@@ -108,7 +133,16 @@ namespace AlpacaTradingApp
         public static async Task<Asset[]> GetAllAssetInfo(AlpacaTradingClient client)
         {
             WaitUntilAvaliable();
-            var assets = await client.ListPositionsAsync();
+            IReadOnlyList<IPosition> assets = null;
+            try
+            {
+                assets = await client.ListPositionsAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
+            }
             Asset[] myAssets = new Asset[assets.Count];
             for (int i = 0; i < assets.Count; i++)
             {
@@ -124,7 +158,16 @@ namespace AlpacaTradingApp
         public static async Task<string[]> GetMyAssetSymbols(AlpacaTradingClient client)
         {
             WaitUntilAvaliable();
-            var assets = await client.ListPositionsAsync();
+            IReadOnlyList<IPosition> assets = null;
+            try
+            {
+                assets = await client.ListPositionsAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
+            }
             string[] myAssets = new string[assets.Count];
             for(int i = 0; i < assets.Count; i++)
             {
@@ -141,7 +184,17 @@ namespace AlpacaTradingApp
         public static async Task<IReadOnlyList<IOrder>> GetOrders(AlpacaTradingClient client)
         {
             WaitUntilAvaliable();
-            return await client.ListAllOrdersAsync();
+            IReadOnlyList<IOrder> orders = null;
+            try
+            {
+                orders = await client.ListAllOrdersAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
+            }
+            return orders;
         }
 
         /// <summary>
@@ -153,12 +206,20 @@ namespace AlpacaTradingApp
         public static async Task<decimal> GetPriceChangePercentage(AlpacaDataClient client, string symbol, int daysToCheck)
         {
             WaitUntilAvaliable();
-            var bars = await client.GetBarSetAsync(new BarSetRequest(symbol.ToUpper(), TimeFrame.Day) { Limit = daysToCheck });
-            decimal startPrice = bars[symbol].First().Open;
-            decimal endPrice = bars[symbol].Last().Close;
-            decimal percentChange = (endPrice - startPrice) / startPrice * 100;
-
-            return percentChange;
+            try
+            {
+                var bars = await client.GetBarSetAsync(new BarSetRequest(symbol.ToUpper(), TimeFrame.Day) { Limit = daysToCheck });
+                decimal startPrice = bars[symbol].First().Open;
+                decimal endPrice = bars[symbol].Last().Close;
+                decimal percentChange = (endPrice - startPrice) / startPrice * 100;
+                return percentChange;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
+                return 0;
+            }
         }
 
         /// <summary>
@@ -167,7 +228,16 @@ namespace AlpacaTradingApp
         public static async Task<bool> IsMarketOpen(AlpacaTradingClient client)
         {
             WaitUntilAvaliable();
-            var clock = await client.GetClockAsync();
+            IClock clock = null;
+            try
+            {
+                clock = await client.GetClockAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
+            }
             if (clock.IsOpen)
             {
                 return true;
@@ -186,8 +256,17 @@ namespace AlpacaTradingApp
         public static async void PlaceBuyOrder(AlpacaTradingClient client, string symbol, int qty)
         {
             WaitUntilAvaliable();
-            var order = await client.PostOrderAsync(new NewOrderRequest(symbol.ToUpper(), qty, OrderSide.Buy, OrderType.Market, TimeInForce.Day));
-            Console.WriteLine($"Buy order made for: {symbol.ToUpper()}, Qty: {qty}");
+            IOrder order = null;
+            try
+            {
+                order = await client.PostOrderAsync(new NewOrderRequest(symbol.ToUpper(), qty, OrderSide.Buy, OrderType.Market, TimeInForce.Day));
+                Console.WriteLine($"Buy order made for: {symbol.ToUpper()}, Qty: {qty}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
+            }
         }
 
         /// <summary>
@@ -198,8 +277,17 @@ namespace AlpacaTradingApp
         public static async void PlaceSellOrder(AlpacaTradingClient client, string symbol, int qty)
         {
             WaitUntilAvaliable();
-            var order = await client.PostOrderAsync(new NewOrderRequest(symbol.ToUpper(), qty, OrderSide.Sell, OrderType.Market, TimeInForce.Day));
-            Console.WriteLine($"Sell order made for: {symbol.ToUpper()}, Qty: {qty}");
+            IOrder order = null;
+            try
+            {
+                order = await client.PostOrderAsync(new NewOrderRequest(symbol.ToUpper(), qty, OrderSide.Sell, OrderType.Market, TimeInForce.Day));
+                Console.WriteLine($"Sell order made for: {symbol.ToUpper()}, Qty: {qty}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
+            }
         }
 
 

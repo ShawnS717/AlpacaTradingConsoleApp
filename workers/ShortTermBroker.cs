@@ -41,11 +41,11 @@ namespace AlpacaTradingApp.workers
                 //if there is stuff to sell then do it first
                 if (linkedAuditor.assets != null && linkedAuditor.assets.Count > 0)
                 {
-                    Console.WriteLine("Found assets to sell");
+                    Console.WriteLine("Found potential assets to sell");
                     foreach (Asset asset in linkedAuditor.assets)
                     {
                         //if an asset is good to sell                       or is past a loss threshold,             and doesn't have an active sell order, sell it
-                        if (asset.ChangePercentage >= (decimal)1.1 || asset.ChangePercentage < (decimal).7 || linkedAuditor.orders.Where(x => x.Symbol == asset.Symbol).Count() > 0)
+                        if (asset.ChangePercentage >= (decimal)1.1 || asset.ChangePercentage < (decimal)-.3 || linkedAuditor.orders.Where(x => x.Symbol == asset.Symbol).Count() > 0)
                         {
                             Console.WriteLine($"Placing sell order for {asset.Symbol}");
                             APIPortal.PlaceSellOrder(client, asset.Symbol, asset.Quantity);
@@ -62,7 +62,7 @@ namespace AlpacaTradingApp.workers
 
                     //let's start with only todays data and make decisions from that
                     //see if there is sufficent data to work with
-                    if (history.PriceHistory.Where(x => x != 0).Count() > 100)
+                    if (history.PriceHistory.Where(x => x != 0).Count() > 10/*0*/)
                     {
                         //if the price is below the lower average           ==>                                 and you can buy it then do so                                                                                     and you don't own any of this symbol
                         if (history.PriceHistory.Where(x => x != 0).Last() <= history.LowerAverage && history.PriceHistory.Where(x => x != 0).Last() + (float)Globals.CurrentlyInvested <= (float)Globals.InvestingMaxAmount && !linkedAuditor.assets.Any(x=>x.Symbol == history.Symbol))
