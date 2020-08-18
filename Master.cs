@@ -53,6 +53,12 @@ namespace AlpacaTradingApp
                     Thread runAuditor = new Thread(auditor.StartEventLoop);
                     Thread shortTermBroker = new Thread(dayTrader.StartEventLoop);
 
+                    //name each of the threads for debug purposes
+                    callTimer.Name = "Timer";
+                    priceUpdater.Name = "Updater";
+                    runAuditor.Name = "Auditor";
+                    shortTermBroker.Name = "Broker";
+
                     //start the workers
                     callTimer.Start();
                     priceUpdater.Start();
@@ -63,15 +69,30 @@ namespace AlpacaTradingApp
                     while (Globals.MarketAvaliability)
                     {
                         //every 30 seconds check the threads
+                        //and if the market is open
                         Thread.Sleep(30000);
+                        lock (tradeClient)
+                        {
+                            Globals.LastMarketAvaliability = Globals.MarketAvaliability;
+                            Globals.MarketAvaliability = APIPortal.IsMarketOpen(tradeClient).Result;
+                        }
 
-                        Console.WriteLine(callTimer.ThreadState);
-                        Console.WriteLine(priceUpdater.ThreadState);
-                        Console.WriteLine(runAuditor.ThreadState);
-                        Console.WriteLine(shortTermBroker.ThreadState);
+                        Console.WriteLine(callTimer.Name + ":");
+                        Console.WriteLine("\t" + callTimer.ThreadState);
+                        Console.WriteLine(priceUpdater.Name + ":");
+                        Console.WriteLine("\t" + priceUpdater.ThreadState);
+                        Console.WriteLine(runAuditor.Name + ":");
+                        Console.WriteLine("\t" + runAuditor.ThreadState);
+                        Console.WriteLine(shortTermBroker.Name + ":");
+                        Console.WriteLine("\t" + shortTermBroker.ThreadState);
                     }
+                    //when the market closes stop the threads
+                    callTimer.Abort();
+                    priceUpdater.Abort();
+                    runAuditor.Abort();
+                    shortTermBroker.Abort();
                 }
-                else if(!Globals.MarketAvaliability)
+                else if (!Globals.MarketAvaliability)
                 {
                     Console.WriteLine("Market is closed");
                 }

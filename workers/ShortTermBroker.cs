@@ -48,7 +48,10 @@ namespace AlpacaTradingApp.workers
                         if (asset.ChangePercentage >= (decimal)1.1 || asset.ChangePercentage < (decimal)-.3 || linkedAuditor.orders.Where(x => x.Symbol == asset.Symbol).Count() > 0)
                         {
                             Console.WriteLine($"Placing sell order for {asset.Symbol}");
-                            APIPortal.PlaceSellOrder(client, asset.Symbol, asset.Quantity);
+                            lock (client)
+                            {
+                                APIPortal.PlaceSellOrder(client, asset.Symbol, asset.Quantity); 
+                            }
                             //wait a second (just in case)
                             Thread.Sleep(1000);
                         }
@@ -67,7 +70,10 @@ namespace AlpacaTradingApp.workers
                         //if the price is below the lower average           ==>                                 and you can buy it then do so                                                                                     and you don't own any of this symbol
                         if (history.PriceHistory.Where(x => x != 0).Last() <= history.LowerAverage && history.PriceHistory.Where(x => x != 0).Last() + (float)Globals.CurrentlyInvested <= (float)Globals.InvestingMaxAmount && !linkedAuditor.assets.Any(x=>x.Symbol == history.Symbol))
                         {
-                            APIPortal.PlaceBuyOrder(client, history.Symbol, 1);
+                            lock (client)
+                            {
+                                APIPortal.PlaceBuyOrder(client, history.Symbol, 1);
+                            }
                         }
                     }
                 }
