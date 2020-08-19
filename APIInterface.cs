@@ -176,8 +176,8 @@ namespace AlpacaTradingApp
             }
             catch (Exception e)
             {
+                Console.WriteLine("API Interface couldn't create the sell order because...");
                 Console.WriteLine(e.Message);
-                Environment.Exit(1);
             }
         }
 
@@ -193,7 +193,7 @@ namespace AlpacaTradingApp
 
 
 
-
+        //unused but may be usefull methods
         public async void GetAccountDetails()
         {
             WaitUntilAvaliable();;

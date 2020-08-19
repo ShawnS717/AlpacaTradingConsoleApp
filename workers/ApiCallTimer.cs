@@ -23,13 +23,11 @@ namespace AlpacaTradingApp.workers
             {
                 if (stopwatch.ElapsedMilliseconds >= 60000)
                 {
-                    Console.WriteLine("\ntimer has elapsed 1 minute. resetting");
                     Console.WriteLine("non updater calls made: " + Interface.apiCalls);
                     lock (Interface)
                     {
                         Interface.apiCalls = 0;
                     }
-                    Console.WriteLine("milliseconds on the clock: " + stopwatch.ElapsedMilliseconds);
                     stopwatch.Restart();
                 }
             }

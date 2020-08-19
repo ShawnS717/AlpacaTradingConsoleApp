@@ -62,28 +62,6 @@ namespace AlpacaTradingApp
                     priceUpdater.Start();
                     runAuditor.Start();
                     shortTermBroker.Start();
-
-                    //while the market is open, check on the threads
-                    while (Globals.MarketAvaliability)
-                    {
-                        //every 30 seconds check the threads
-                        //and if the market is open
-                        Thread.Sleep(30000);
-                        lock (aPIInterface)
-                        {
-                            Globals.LastMarketAvaliability = Globals.MarketAvaliability;
-                            Globals.MarketAvaliability = aPIInterface.IsMarketOpen().Result;
-                        }
-
-                        Console.WriteLine(callTimer.Name + ":");
-                        Console.WriteLine("\t" + callTimer.ThreadState);
-                        Console.WriteLine(priceUpdater.Name + ":");
-                        Console.WriteLine("\t" + priceUpdater.ThreadState);
-                        Console.WriteLine(runAuditor.Name + ":");
-                        Console.WriteLine("\t" + runAuditor.ThreadState);
-                        Console.WriteLine(shortTermBroker.Name + ":");
-                        Console.WriteLine("\t" + shortTermBroker.ThreadState);
-                    }
                 }
                 else if (!Globals.MarketAvaliability)
                 {
