@@ -35,8 +35,7 @@ namespace AlpacaTradingApp.config
             "GROW",
             "EOD",
         };
-        //for the sake of testing the max has been upped from 10
-        public static decimal InvestingMaxAmount = 100;
+        public static decimal InvestingMaxAmount = 10;
         public static decimal CurrentlyInvested = 0;
         public static decimal IndividualInvestMaxAmount = 1;
     }

@@ -6,9 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-//this is to replace the APIPortal when completed
-//this object will be in charge of talking to the api instead of a static class
-//instead of having to lock the clients you just lock this interface
 namespace AlpacaTradingApp
 {
     public class APIInterface
@@ -247,7 +244,6 @@ namespace AlpacaTradingApp
         /// <returns>Boolean that says if it is tradable or not</returns>
         public async Task<bool> IsAssetTradable(string symbol)
         {
-            WaitUntilAvaliable();
             try
             {
                 var asset = await tradeClient.GetAssetAsync(symbol.ToUpper());
@@ -264,6 +260,21 @@ namespace AlpacaTradingApp
             {
                 return false;
             }
+        }
+        public async Task<decimal> TempPriceCheck(string symbol)
+        {
+            try
+            {
+                var result = await dataClient.GetBarSetAsync(new BarSetRequest(symbol.ToUpper(), TimeFrame.Minute));
+                return result[symbol].Last().Low;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
+                return 0;
+            }
+
         }
 
     }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.IO;
+using System.Text;
 
 namespace AlpacaTradingApp
 {
@@ -12,6 +13,10 @@ namespace AlpacaTradingApp
     {
         static void Main(string[] args)
         {
+            //remove when finished or keep stored away for later vvv
+            Console.WriteLine($"symbols with a price under {Globals.InvestingMaxAmount}");
+            OutputViableSymbols(new APIInterface());
+            Environment.Exit(0);
             //make the needed shared variables
             APIInterface aPIInterface = new APIInterface();
             if (!Directory.Exists(Globals.SaveFolder))
@@ -94,6 +99,84 @@ namespace AlpacaTradingApp
                 symbolHistories.Add(new SymbolHistory(symbol));
             }
             return symbolHistories;
+        }
+        public static void OutputViableSymbols(APIInterface aPIInterface)
+        {
+            Dictionary<int, string> numberToCharacter = new Dictionary<int, string>
+            {
+                {0,null },
+                {1,"A" },
+                {2,"B" },
+                {3,"C" },
+                {4,"D" },
+                {5,"E" },
+                {6,"F" },
+                {7,"G" },
+                {8,"H" },
+                {9,"I" },
+                {10,"J" },
+                {11,"K" },
+                {12,"L" },
+                {13,"M" },
+                {14,"N" },
+                {15,"O" },
+                {16,"P" },
+                {17,"Q" },
+                {18,"R" },
+                {19,"S" },
+                {20,"T" },
+                {21,"U" },
+                {22,"V" },
+                {23,"W" },
+                {24,"X" },
+                {25,"Y" },
+                {26,"Z" }
+            };
+
+            Console.WriteLine("{");
+            int tank1 = 0, tank2 = 0, tank3 = 0, tank4 = 0, tank5 = 0, tank6 = 0;
+            while (tank6 < 27)
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.Append(numberToCharacter[tank1]).Append(numberToCharacter[tank2]).Append(numberToCharacter[tank3]).Append(numberToCharacter[tank4]).Append(numberToCharacter[tank5]).Append(numberToCharacter[tank6]);
+                tank1++;
+                if (tank1 > 26)
+                {
+                    tank2++;
+                    tank1 = 0;
+                }
+                if (tank2 > 26)
+                {
+                    tank3++;
+                    tank2 = 0;
+                }
+                if (tank3 > 26)
+                {
+                    tank4++;
+                    tank3 = 0;
+                }
+                if (tank4 > 26)
+                {
+                    tank5++;
+                    tank4 = 0;
+                }
+                if (tank5 > 26)
+                {
+                    tank6++;
+                    tank5 = 0;
+                }
+                //after the string has been built check it against the api
+                if (aPIInterface.IsAssetTradable(stringBuilder.ToString()).Result)
+                {
+                    if (aPIInterface.TempPriceCheck(stringBuilder.ToString()).Result < Globals.InvestingMaxAmount)
+                    {
+                        Console.WriteLine($"{stringBuilder},"); 
+                    }
+                }
+                Thread.Sleep(333);
+            }
+
+            Console.WriteLine("}");
         }
     }
 }
