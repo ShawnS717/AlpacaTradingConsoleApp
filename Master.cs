@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.IO;
 using System.Text;
+using System.Linq;
 
 namespace AlpacaTradingApp
 {
@@ -102,6 +103,7 @@ namespace AlpacaTradingApp
         }
         public static void OutputViableSymbols(APIInterface aPIInterface)
         {
+            List<string> foundStrings = new List<string>();
             Dictionary<int, string> numberToCharacter = new Dictionary<int, string>
             {
                 {0,null },
@@ -133,7 +135,6 @@ namespace AlpacaTradingApp
                 {26,"Z" }
             };
 
-            Console.WriteLine("{");
             int tank1 = 0, tank2 = 0, tank3 = 0, tank4 = 0, tank5 = 0, tank6 = 0;
             while (tank6 < 27)
             {
@@ -166,16 +167,26 @@ namespace AlpacaTradingApp
                     tank5 = 0;
                 }
                 //after the string has been built check it against the api
-                if (aPIInterface.IsAssetTradable(stringBuilder.ToString()).Result)
+                if (!foundStrings.Contains(stringBuilder.ToString()))
                 {
-                    if (aPIInterface.TempPriceCheck(stringBuilder.ToString()).Result < Globals.InvestingMaxAmount)
+                    if (aPIInterface.IsAssetTradable(stringBuilder.ToString()).Result)
                     {
-                        Console.WriteLine($"{stringBuilder},"); 
-                    }
+                        if (aPIInterface.TempPriceCheck(stringBuilder.ToString()).Result < Globals.InvestingMaxAmount)
+                        {
+                            //if it fits all the criteria then put it in the list
+                            foundStrings.Add(stringBuilder.ToString());
+                        }
+                    } 
                 }
                 Thread.Sleep(333);
             }
-
+            //report the findings
+            foundStrings = foundStrings.Distinct().ToList();
+            Console.WriteLine("{");
+            foreach(var item in foundStrings)
+            {
+                Console.WriteLine(item+",");
+            }
             Console.WriteLine("}");
         }
     }
