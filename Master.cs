@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.IO;
-using System.Net.Http.Headers;
 
 namespace AlpacaTradingApp
 {
@@ -14,8 +13,7 @@ namespace AlpacaTradingApp
         static void Main(string[] args)
         {
             //make the needed shared variables
-            AlpacaTradingClient tradeClient = APIPortal.MakeTradingClient();
-            AlpacaDataClient dataClient = APIPortal.MakeDataClient();
+            APIInterface aPIInterface = new APIInterface();
             if (!Directory.Exists(Globals.SaveFolder))
             {
                 Directory.CreateDirectory(Globals.SaveFolder);
@@ -27,10 +25,10 @@ namespace AlpacaTradingApp
             //check if the market is open
             while (true)
             {
-                lock (tradeClient)
+                lock (aPIInterface)
                 {
                     Globals.LastMarketAvaliability = Globals.MarketAvaliability;
-                    Globals.MarketAvaliability = APIPortal.IsMarketOpen(tradeClient).Result;
+                    Globals.MarketAvaliability = aPIInterface.IsMarketOpen().Result;
                 }
 
                 //if the market has opened then start the workers
@@ -42,13 +40,13 @@ namespace AlpacaTradingApp
                     List<SymbolHistory> histories = CreateHistories();
 
                     //make and link the workers
-                    MarketPriceUpdater priceUpdateWorker = new MarketPriceUpdater(dataClient, histories);
-                    Auditor auditor = new Auditor(tradeClient);
-                    ShortTermBroker dayTrader = new ShortTermBroker(tradeClient, histories, auditor);
+                    MarketPriceUpdater priceUpdateWorker = new MarketPriceUpdater(aPIInterface, histories);
+                    Auditor auditor = new Auditor(aPIInterface);
+                    ShortTermBroker dayTrader = new ShortTermBroker(aPIInterface, histories, auditor);
 
                     //put pointers to any events here:
 
-                    Thread callTimer = new Thread(new ApiCallTimer().StartEventLoop);
+                    Thread callTimer = new Thread(new ApiCallTimer(aPIInterface).StartEventLoop);
                     Thread priceUpdater = new Thread(priceUpdateWorker.UpdatePrices);
                     Thread runAuditor = new Thread(auditor.StartEventLoop);
                     Thread shortTermBroker = new Thread(dayTrader.StartEventLoop);
@@ -71,10 +69,10 @@ namespace AlpacaTradingApp
                         //every 30 seconds check the threads
                         //and if the market is open
                         Thread.Sleep(30000);
-                        lock (tradeClient)
+                        lock (aPIInterface)
                         {
                             Globals.LastMarketAvaliability = Globals.MarketAvaliability;
-                            Globals.MarketAvaliability = APIPortal.IsMarketOpen(tradeClient).Result;
+                            Globals.MarketAvaliability = aPIInterface.IsMarketOpen().Result;
                         }
 
                         Console.WriteLine(callTimer.Name + ":");
@@ -86,16 +84,12 @@ namespace AlpacaTradingApp
                         Console.WriteLine(shortTermBroker.Name + ":");
                         Console.WriteLine("\t" + shortTermBroker.ThreadState);
                     }
-                    //when the market closes stop the threads
-                    callTimer.Abort();
-                    priceUpdater.Abort();
-                    runAuditor.Abort();
-                    shortTermBroker.Abort();
                 }
                 else if (!Globals.MarketAvaliability)
                 {
                     Console.WriteLine("Market is closed");
                 }
+                //check for market avalibility every minute until it's open
                 Thread.Sleep(60000);
             }
         }
