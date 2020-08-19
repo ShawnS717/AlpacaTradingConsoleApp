@@ -16,6 +16,7 @@ namespace AlpacaTradingApp
         public AlpacaTradingClient tradeClient;
         public AlpacaDataClient dataClient;
         public byte apiCalls = 0;
+        public List<string> callers = new List<string>();
 
         //constructors
         public APIInterface()
@@ -35,6 +36,7 @@ namespace AlpacaTradingApp
             //if it's not the updater then increment
             if (Thread.CurrentThread.Name != "Updater")
             {
+                callers.Add(Thread.CurrentThread.Name);
                 apiCalls++; 
             }
         }
@@ -187,6 +189,7 @@ namespace AlpacaTradingApp
         /// <param name="symbol">the symbol for what to remove</param>
         public async void EmergencyLiquidate(string symbol)
         {
+            WaitUntilAvaliable();
             await tradeClient.DeletePositionAsync(new DeletePositionRequest(symbol));
         }
 

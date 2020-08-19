@@ -26,7 +26,13 @@ namespace AlpacaTradingApp.workers
                     Console.WriteLine("non updater calls made: " + Interface.apiCalls);
                     lock (Interface)
                     {
+                        Console.WriteLine("callers were:");
+                        foreach (string item in Interface.callers)
+                        {
+                            Console.WriteLine("\t" + item);
+                        }
                         Interface.apiCalls = 0;
+                        Interface.callers.Clear();
                     }
                     stopwatch.Restart();
                 }

@@ -51,17 +51,31 @@ namespace AlpacaTradingApp
                     Thread runAuditor = new Thread(auditor.StartEventLoop);
                     Thread shortTermBroker = new Thread(dayTrader.StartEventLoop);
 
-                    //name each of the threads for debug purposes
+                    //name each of the threads
+                    Thread.CurrentThread.Name = "Main";
                     callTimer.Name = "Timer";
                     priceUpdater.Name = "Updater";
                     runAuditor.Name = "Auditor";
-                    shortTermBroker.Name = "Broker";
+                    shortTermBroker.Name = "S_Broker";
 
                     //start the workers
                     callTimer.Start();
                     priceUpdater.Start();
                     runAuditor.Start();
                     shortTermBroker.Start();
+                    //threads terminate themselves
+
+                    while (Globals.MarketAvaliability)
+                    {
+                        lock (aPIInterface)
+                        {
+                            Globals.LastMarketAvaliability = Globals.MarketAvaliability;
+                            Globals.MarketAvaliability = aPIInterface.IsMarketOpen().Result;
+                        }
+                        //anything you want done while the market is open/threads are alive do here
+
+                        Thread.Sleep(60000);
+                    }
                 }
                 else if (!Globals.MarketAvaliability)
                 {

@@ -49,7 +49,7 @@ namespace AlpacaTradingApp.workers
                         //if an asset is good to sell (in this case made 5 cents)             or if it went past a loss threshold (in this case lost 10 cents),             and doesn't have an active sell order, sell it
                         if ((asset.CurrentPrice * asset.ChangePercentage) >= (decimal).05 || (asset.CurrentPrice * asset.ChangePercentage) < (decimal)-.1 || linkedAuditor.orders.Where(x => x.Symbol == asset.Symbol).Count() > 0)
                         {
-                            Console.WriteLine($"Placing sell order for {asset.Symbol}");
+                            Console.WriteLine($"Placing sell order for {asset.Symbol} at a gain/loss of: ${(asset.CurrentPrice * asset.ChangePercentage):0.00}");
                             lock (Interface)
                             {
                                 Interface.PlaceSellOrder(asset.Symbol, asset.Quantity);
