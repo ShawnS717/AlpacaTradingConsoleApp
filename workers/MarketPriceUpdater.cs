@@ -15,15 +15,15 @@ namespace AlpacaTradingApp.workers
 {
     public class MarketPriceUpdater
     {
-        private readonly AlpacaDataClient client;
+        private APIInterface Interface;
         private List<SymbolHistory> symbolHistories;
         public DateTime StartTime;
         public DateTime EndTime;
 
         public MarketPriceUpdater() { }
-        public MarketPriceUpdater(AlpacaDataClient givenClient, List<SymbolHistory> givenSymbolHistories)
+        public MarketPriceUpdater(APIInterface aPIInterface, List<SymbolHistory> givenSymbolHistories)
         {
-            client = givenClient;
+            Interface = aPIInterface;
             symbolHistories = givenSymbolHistories;
         }
 
@@ -38,17 +38,15 @@ namespace AlpacaTradingApp.workers
                     if (Globals.MarketAvaliability)
                     {
                         decimal newprice;
-                        lock (client)
+                        lock (Interface)
                         {
                             lock (symbolHistories)
                             {
-                                newprice = APIPortal.PriceCheck(client, item.Symbol).Result;
-                                Globals.ApiCalls--;
+                                newprice = Interface.PriceCheck(item.Symbol).Result;
                             }
                         }
                         if (item.UpdateCurrentPrice(newprice))
                             Console.WriteLine("Price updated for: " + item.Symbol);
-                        //^^^if put into a winform app change the output location
 
                         Thread.Sleep(500);
                     }
@@ -61,28 +59,28 @@ namespace AlpacaTradingApp.workers
             }
             //after the market closes do the saving
 
-                    //TODO:
-                    /////////////////////////////////////////////////
-                    //Saving temporaraly commented out until a long term broker is created
-                    //unneeded until that day
-                    /////////////////////////////////////////////////
-                    EndTime = DateTime.Now;
-                    //foreach (SymbolHistory history in symbolHistories)
-                    //{
-                    //    string currentFileLocation = Path.Combine(Config.SaveFolder, history.Symbol + " " + DateTime.Today.Day + "-" + DateTime.Today.Month + "-" + DateTime.Today.Year + ".txt");
-                    //    File.AppendAllText(currentFileLocation,
-                    //        history.Symbol + "\n" +
-                    //        DateTime.Today.ToShortDateString() + "\n" +
-                    //        "Started: " + StartTime.ToShortTimeString() + "\n" +
-                    //        "Ended: " + EndTime.ToShortTimeString() + "\n\n"
-                    //        );
-                    //    StringBuilder builder = new StringBuilder();
-                    //    foreach (float price in history.PriceHistory.Where(x => x != 0))
-                    //    {
-                    //        builder.Append(price.ToString()).AppendLine();
-                    //    }
-                    //    File.AppendAllText(currentFileLocation, builder.ToString());
-                    //}
+            //TODO:
+            /////////////////////////////////////////////////
+            //Saving temporaraly commented out until a long term broker is created
+            //unneeded until that day
+            /////////////////////////////////////////////////
+            EndTime = DateTime.Now;
+            //foreach (SymbolHistory history in symbolHistories)
+            //{
+            //    string currentFileLocation = Path.Combine(Config.SaveFolder, history.Symbol + " " + DateTime.Today.Day + "-" + DateTime.Today.Month + "-" + DateTime.Today.Year + ".txt");
+            //    File.AppendAllText(currentFileLocation,
+            //        history.Symbol + "\n" +
+            //        DateTime.Today.ToShortDateString() + "\n" +
+            //        "Started: " + StartTime.ToShortTimeString() + "\n" +
+            //        "Ended: " + EndTime.ToShortTimeString() + "\n\n"
+            //        );
+            //    StringBuilder builder = new StringBuilder();
+            //    foreach (float price in history.PriceHistory.Where(x => x != 0))
+            //    {
+            //        builder.Append(price.ToString()).AppendLine();
+            //    }
+            //    File.AppendAllText(currentFileLocation, builder.ToString());
+            //}
 
         }
     }
