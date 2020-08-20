@@ -261,21 +261,5 @@ namespace AlpacaTradingApp
                 return false;
             }
         }
-        public async Task<decimal> TempPriceCheck(string symbol)
-        {
-            try
-            {
-                var result = await dataClient.GetBarSetAsync(new BarSetRequest(symbol.ToUpper(), TimeFrame.Minute));
-                return result[symbol].Last().Low;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                Environment.Exit(1);
-                return 0;
-            }
-
-        }
-
     }
 }
